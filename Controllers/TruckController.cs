@@ -53,12 +53,46 @@ namespace APIRest.Controllers
             {
                 var response = new
                 {
-                    Message = $"La flota con ID '{truck.fleetId}' no se encontró."
+                    Message = $"The fleet with ID '{truck.fleetId}' was not found."
                 };
                 return NotFound(response);
             }
             DataStore.Trucks.Add(truck);
             return CreatedAtAction(nameof(GetById),new { id = truck.id }, truck);
+        }
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<Truck> Put(Truck truck)
+        {
+            var truckOld = DataStore.Trucks.FirstOrDefault(t => t.id == truck.id);
+            if (truckOld == null)
+            {
+                var response = new
+                {
+                    Message = $"The truck with ID '{truck.id}' was not found."
+                };
+                return NotFound(response);
+            }
+            var fleet = DataStore.Fleets.FirstOrDefault(f => f.id == truck.fleetId);
+            if (fleet == null)
+            {
+                var response = new
+                {
+                    Message = $"The fleet with ID '{truck.fleetId}' was not found."
+                };
+                return NotFound(response);
+            }
+
+            truckOld.ubication = truck.ubication;
+            truckOld.state = truck.state;
+            truckOld.fleetId = truck.fleetId;
+
+            var result = new
+            {
+                Truck = DataStore.Trucks.FirstOrDefault(f => f.id == truck.id)
+            };
+            return Ok(result);
         }
     }
 }

@@ -32,7 +32,14 @@ namespace APIRest.Controllers
         public IActionResult GetById(String id)
         {
             var fleet = DataStore.Fleets.FirstOrDefault(f => f.id == id);
-            if (fleet == null) return NotFound();
+            if (fleet == null)
+            {
+                var response = new
+                {
+                    Message = $"The fleet with ID '{id}' was not found."
+                };
+                return NotFound(response);
+            }
             var trucks = DataStore.Trucks.Where(t => t.fleetId == id).ToList();
 
             var result = new
@@ -53,6 +60,29 @@ namespace APIRest.Controllers
             
             DataStore.Fleets.Add(fleet);
             return CreatedAtAction(nameof(GetById), new { id = fleet.id }, fleet);
+        }
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<Fleet> Put(Fleet fleet)
+        {
+            var fleetOld = DataStore.Fleets.FirstOrDefault(f => f.id == fleet.id);
+            if(fleetOld == null)
+            {
+                var response = new
+                {
+                    Message = $"The fleet with ID '{fleet.id}' was not found."
+                };
+                return NotFound(response);
+            }
+            
+            fleetOld.company = fleet.company;
+
+            var result = new
+            {
+                Fleet = DataStore.Fleets.FirstOrDefault(f => f.id == fleet.id)
+            };
+            return Ok(result);
         }
     }
 }
