@@ -53,8 +53,10 @@ namespace APIRest.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<Truck> Post(Truck truck)
         {
-            var size = DataStore.Trucks.Count;
-            truck.id = $"T{size + 1}";
+            var truckLast = DataStore.Trucks.Last();
+            var nId = int.Parse(truckLast.id.Replace('T', ' '));
+            truck.id = $"T{nId + 1}";
+
             var fleet = DataStore.Fleets.FirstOrDefault(f => f.id == truck.fleetId);
             if (fleet == null)
             {

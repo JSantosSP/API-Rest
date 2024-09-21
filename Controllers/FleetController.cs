@@ -55,8 +55,9 @@ namespace APIRest.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public ActionResult<Fleet> Post(Fleet fleet)
         {
-            var size = DataStore.Fleets.Count;
-            fleet.id = $"F{size + 1}";
+            var fleetLast = DataStore.Fleets.Last();
+            var nId = int.Parse(fleetLast.id.Replace('F', ' '));
+            fleet.id = $"F{nId + 1}";
             
             DataStore.Fleets.Add(fleet);
             return CreatedAtAction(nameof(GetById), new { id = fleet.id }, fleet);
