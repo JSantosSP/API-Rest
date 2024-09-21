@@ -1,5 +1,6 @@
 ﻿using APIRest.Models;
 using APIRest.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -28,7 +29,7 @@ namespace APIRest.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetFleet(String id)
+        public IActionResult GetById(String id)
         {
             var fleet = DataStore.Fleets.FirstOrDefault(f => f.id == id);
             if (fleet == null) return NotFound();
@@ -40,6 +41,18 @@ namespace APIRest.Controllers
                 Trucks = trucks
             };
             return Ok(result);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<Fleet> Post(Fleet fleet)
+        {
+            var size = DataStore.Fleets.Count;
+            fleet.id = $"F{size + 1}";
+            
+            DataStore.Fleets.Add(fleet);
+            return CreatedAtAction(nameof(GetById), new { id = fleet.id }, fleet);
         }
     }
 }
