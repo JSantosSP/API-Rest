@@ -32,7 +32,14 @@ namespace APIRest.Controllers
         public IActionResult GetById(String id)
         {
             var truck = DataStore.Trucks.FirstOrDefault(t => t.id == id);
-            if (truck == null) return NotFound();
+            if (truck == null)
+            {
+                var response = new
+                {
+                    Message = $"The truck with ID '{id}' was not found."
+                };
+                return NotFound(response);
+            }
 
             var result = new
             {
@@ -93,6 +100,23 @@ namespace APIRest.Controllers
                 Truck = DataStore.Trucks.FirstOrDefault(f => f.id == truck.id)
             };
             return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public IActionResult Delete(String id)
+        {
+            var truck = DataStore.Trucks.FirstOrDefault(t => t.id == id);
+            if (truck == null)
+            {
+                var response = new
+                {
+                    Message = $"The truck with ID '{id}' was not found."
+                };
+                return NotFound(response);
+            }
+            DataStore.Trucks.Remove(truck);
+            return NoContent();
         }
     }
 }

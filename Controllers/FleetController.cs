@@ -84,5 +84,26 @@ namespace APIRest.Controllers
             };
             return Ok(result);
         }
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public IActionResult Delete(String id)
+        {
+            var fleet = DataStore.Fleets.FirstOrDefault(f => f.id == id);
+            if (fleet == null)
+            {
+                var response = new
+                {
+                    Message = $"The fleet with ID '{id}' was not found."
+                };
+                return NotFound(response);
+            }
+            var trucks = DataStore.Trucks.Where(t => t.fleetId == id).ToList();
+            foreach(Truck truck in trucks)
+            {
+                DataStore.Trucks.Remove(truck);
+            }
+            DataStore.Fleets.Remove(fleet);
+            return NoContent();
+        }
     }
 }
